@@ -17,7 +17,6 @@ service = Service(ChromeDriverManager().install())
 options = webdriver.ChromeOptions()
 
 
-
 def book_toscrap():
     options.add_argument(f'--user-data-dir={PROFILE_PATH}')
     driver = webdriver.Chrome(service=service, options=options)
