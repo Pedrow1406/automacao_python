@@ -85,7 +85,7 @@ i = 0
 
 while True:
     try:
-        img = pg.locateCenterOnScreen('GoldCookie.webp', confidence=0.7)
+        img = pg.locateCenterOnScreen('img/GoldCookie.webp', confidence=0.7)
         pg.click(img.x, img.y)
     except:
         ...
