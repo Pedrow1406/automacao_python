@@ -112,3 +112,5 @@ def acessar_youtube(search) -> str:
     sleep(.5)
     pa.press('ENTER')
     sleep(5)
+
+book_toscrap()
