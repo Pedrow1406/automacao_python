@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By # Para selecionar o elemento
 import pyautogui as pa
 from time import sleep
 import pyperclip
+import keyboard
 
 import pandas as pd
 from tabulate import tabulate
@@ -94,23 +95,63 @@ def dolar_hoje():
         print(f'1 {moeda} equivale a {valor.text} reais brasileiro')
     driver.quit()
 def acessar_youtube(search) -> str:
-    pa.press('win')
-    sleep(.5)
-    pa.write("chrome")
-    sleep(1)
-    pa.press('ENTER')
-    sleep(1)
-    pa.write("youtube.com")
-    sleep(.4)
-    pa.press('ENTER')
-    sleep(3.5)
-    pa.click(x=746, y=185)
-    sleep(.5)
-    pyperclip.copy(search) # ele da um ctrl + c
-    sleep(0.3)
-    pa.hotkey('ctrl', 'v')
-    sleep(.5)
-    pa.press('ENTER')
-    sleep(5)
+        options.add_argument('--start-maximized')
+        driver = webdriver.Chrome(service=service, options=options)
+        driver.get('https://www.youtube.com/')
+        sleep(5)
+        barra_de_pesquisa = driver.find_element(By.NAME, 'search_query')
+        barra_de_pesquisa.click()
+        sleep(1)
+        barra_de_pesquisa.send_keys(search)
+        barra_de_pesquisa.submit()
+        while True:
+            if keyboard.is_pressed('esc'):
+                driver.quit()
+                break
+def mercado_livre(search) -> str:
 
-book_toscrap()
+    def linha(quantidade=55):
+        print('=-'*quantidade)
+
+    url = 'https://www.mercadolivre.com.br/'
+    options.add_argument('--start-maximized')
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    sleep(5)
+    barra_de_pesquisa = driver.find_element(By.CLASS_NAME, "nav-search-input")
+    barra_de_pesquisa.send_keys(search)
+    barra_de_pesquisa.submit()
+    sleep(3)
+    produtos = driver.find_elements(By.CLASS_NAME, 'ui-search-layout__item')
+    nome_produtos = [p.find_element(By.CLASS_NAME, 'ui-search-item__title').text for p in produtos if p is not None]
+    preco_produtos = [p.find_element(By.CLASS_NAME, "ui-search-price__second-line") for p in produtos if p is not None]
+    preco_produtos = [p.find_element(By.CLASS_NAME, 'andes-money-amount__fraction').text for p in preco_produtos]
+    print('LISTA DE PRODUTOS:')
+    for i, p in enumerate(nome_produtos):
+        print(f' - Produto: {p}',end=' | ')
+        print(f'R${preco_produtos[i]}')
+        print()
+    print(f'Total de Produtos Encontrados: {len(nome_produtos)}')
+    preco_float = [float(cada_produto.replace('.','')) for cada_produto in preco_produtos]
+    menor_valor = min(preco_float)
+    maior_valor = max(preco_float)
+    linha()
+    sleep(.5)
+    for i, p in enumerate(nome_produtos):
+        try:
+            produto_mais_vendido = produtos[i].find_element(By.CLASS_NAME, "ui-search-item__highlight-label--best_seller")
+            produto_mais_vendido = produto_mais_vendido.find_element(By.CLASS_NAME,'ui-search-item__highlight-label__container')
+            produto_mais_vendido = produto_mais_vendido.find_element(By.TAG_NAME, 'label')
+        except: 
+            produto_mais_vendido = False
+            
+        if menor_valor == preco_float[i]:
+            print(f'Produto mais Barato: {p} | R${preco_produtos[i]}')
+        if maior_valor == preco_float[i]:
+            print(f'Produto mais Caro: {p} | R${preco_produtos[i]}')
+        if produto_mais_vendido:
+            print(f'Produto mais Vendido: {p} | R${preco_produtos[i]}')
+    linha()
+
+if __name__ == '__main__':
+    mercado_livre('fone de ouvido')
