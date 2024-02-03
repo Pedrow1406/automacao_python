@@ -117,41 +117,64 @@ def mercado_livre(search) -> str:
     options.add_argument('--start-maximized')
     driver = webdriver.Chrome(options=options)
     driver.get(url)
-    sleep(5)
+    try:
+        cookie = driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div/div[2]/button[1]').click()
+    except: ...
     barra_de_pesquisa = driver.find_element(By.CLASS_NAME, "nav-search-input")
     barra_de_pesquisa.send_keys(search)
     barra_de_pesquisa.submit()
     sleep(3)
-    produtos = driver.find_elements(By.CLASS_NAME, 'ui-search-layout__item')
-    nome_produtos = [p.find_element(By.CLASS_NAME, 'ui-search-item__title').text for p in produtos if p is not None]
-    preco_produtos = [p.find_element(By.CLASS_NAME, "ui-search-price__second-line") for p in produtos if p is not None]
-    preco_produtos = [p.find_element(By.CLASS_NAME, 'andes-money-amount__fraction').text for p in preco_produtos]
+    todos_nomes = []
+    todos_precos = []
+    produto_mais_vendido = False
+    c = 0
     print('LISTA DE PRODUTOS:')
-    for i, p in enumerate(nome_produtos):
-        print(f' - Produto: {p}',end=' | ')
-        print(f'R${preco_produtos[i]}')
-        print()
-    print(f'Total de Produtos Encontrados: {len(nome_produtos)}')
-    preco_float = [float(cada_produto.replace('.','')) for cada_produto in preco_produtos]
+    while True:
+        driver.current_url
+        produtos = [d for d in driver.find_elements(By.CLASS_NAME, 'ui-search-layout__item')]
+        nome_produtos = [p.find_element(By.CLASS_NAME, 'ui-search-item__title').text for p in produtos if p is not None]
+        preco_produtos = [p.find_element(By.CLASS_NAME, "ui-search-price__second-line") for p in produtos if p is not None]
+        preco_produtos = [p.find_element(By.CLASS_NAME, 'andes-money-amount__fraction').text for p in preco_produtos]
+        c+=1
+        print(f' Página {c}')
+        for i, p in enumerate(nome_produtos):
+            print(f'    - Produto: {p}',end=' | ')
+            todos_nomes.append(p)
+            print(f'R${preco_produtos[i]}')
+            todos_precos.append(preco_produtos[i])
+            print()
+            try:
+                produto_mais_vendido = produtos[i].find_element(By.CLASS_NAME, "ui-search-item__highlight-label--best_seller")
+                produto_mais_vendido = produto_mais_vendido.find_element(By.CLASS_NAME,'ui-search-item__highlight-label__container')
+                produto_mais_vendido = produto_mais_vendido.find_element(By.TAG_NAME, 'label')
+                nome_produto_mais_vendido = p
+                preco_produto_mais_vendido = preco_produtos[i]
+            except: ...
+        try:
+            proxima = driver.find_element(By.CSS_SELECTOR, '#root-app > div > div.ui-search-main.ui-search-main--only-products.ui-search-main--with-topkeywords > section > nav > ul > li.andes-pagination__button.andes-pagination__button--next')
+            next = proxima.find_element(By.CLASS_NAME, 'andes-pagination__link')
+            sleep(.5)
+            next.click()
+            sleep(.5)
+        except:
+            break
+    
+    print(f'Total de Produtos Encontrados: {len(todos_nomes)}')
+    preco_float = [float(cada_produto.replace('.','')) for cada_produto in todos_precos]
     menor_valor = min(preco_float)
     maior_valor = max(preco_float)
     linha()
     sleep(.5)
-    for i, p in enumerate(nome_produtos):
-        try:
-            produto_mais_vendido = produtos[i].find_element(By.CLASS_NAME, "ui-search-item__highlight-label--best_seller")
-            produto_mais_vendido = produto_mais_vendido.find_element(By.CLASS_NAME,'ui-search-item__highlight-label__container')
-            produto_mais_vendido = produto_mais_vendido.find_element(By.TAG_NAME, 'label')
-        except: 
-            produto_mais_vendido = False
+    for i, p in enumerate(todos_nomes):
             
         if menor_valor == preco_float[i]:
-            print(f'Produto mais Barato: {p} | R${preco_produtos[i]}')
+            print(f'Produto mais Barato: {p} | R${todos_precos[i]}')
         if maior_valor == preco_float[i]:
-            print(f'Produto mais Caro: {p} | R${preco_produtos[i]}')
+            print(f'Produto mais Caro: {p} | R${todos_precos[i]}')
         if produto_mais_vendido:
-            print(f'Produto mais Vendido: {p} | R${preco_produtos[i]}')
+            print(f'Produto mais Vendido: {nome_produto_mais_vendido} | R${preco_produto_mais_vendido}')
+            produto_mais_vendido = False
     linha()
 
 if __name__ == '__main__':
-    mercado_livre('fone de ouvido')
+    mercado_livre('ps5')
