@@ -12,8 +12,9 @@ import keyboard
 import pandas as pd
 from tabulate import tabulate
 
+from position import scroll
 
-PROFILE_PATH = 'C:\\Users\\apfri\\AppData\\Local\\Google\\Chrome\\User Data\\Default'
+PROFILE_PATH = r'C:\Users\apfri\AppData\Local\Google\Chrome\User Data\Default'
 service = Service(ChromeDriverManager().install())
 options = webdriver.ChromeOptions()
 
@@ -175,6 +176,22 @@ def mercado_livre(search) -> str:
             print(f'Produto mais Vendido: {nome_produto_mais_vendido} | R${preco_produto_mais_vendido}')
             produto_mais_vendido = False
     linha()
+def comentario_youtube(url_video):
+    url = url_video
+    options = webdriver.ChromeOptions()
+    options.add_argument(f'--user-data-dir={PROFILE_PATH}')
+    options.add_argument('--start-maximized')
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    sleep(5)
+    scroll()
+    sleep(10)
+
+    lista_comentarios = driver.find_elements(By.XPATH, '//ytd-comment-thread-renderer[contains(@class, "style-scope ytd-item-section-renderer")]')
+    nome_perfil = [nome.find_element(By.XPATH, './/yt-formatted-string[contains(@class," style-scope ytd-comment-renderer style-scope ytd-comment-renderer")]').text for nome in lista_comentarios if nome is not None]
+    print(nome_perfil)
+    print(len(nome_perfil))
 
 if __name__ == '__main__':
-    mercado_livre('ps5')
+    comentario_youtube('https://www.youtube.com/watch?v=AFffT1qmuGs&ab_channel=DevAprender%7CJhonatandeSouza')
+
