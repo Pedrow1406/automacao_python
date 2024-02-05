@@ -4,11 +4,13 @@ from selenium.webdriver.chrome.service import Service # Para o webdriver-manager
 from selenium.webdriver.common.keys import Keys # é usada para enviar sequências de teclas
 from selenium.webdriver.common.by import By # Para selecionar o elemento 
 
+from bs4 import BeautifulSoup
+import requests
 import pyautogui as pa
 from time import sleep
 import pyperclip
 import keyboard
-
+import threading
 import pandas as pd
 from tabulate import tabulate
 
@@ -18,6 +20,8 @@ PROFILE_PATH = r'C:\Users\apfri\AppData\Local\Google\Chrome\User Data\Default'
 service = Service(ChromeDriverManager().install())
 options = webdriver.ChromeOptions()
 
+def linha(quantidade=55):
+    print('=-'*quantidade)
 
 def instagram_acess(username,your_password, text) -> str:
     user = '#loginForm > div > div:nth-child(1) > div > label > input'
@@ -111,8 +115,6 @@ def acessar_youtube(search) -> str:
                 break
 def mercado_livre(search) -> str:
 
-    def linha(quantidade=55):
-        print('=-'*quantidade)
 
     url = 'https://www.mercadolivre.com.br/'
     options.add_argument('--start-maximized')
@@ -192,6 +194,33 @@ def comentario_youtube(url_video):
     print(nome_perfil)
     print(len(nome_perfil))
 
+def get_user_tiktok():
+    options.add_argument('--start-maximized')
+    options.add_argument(f'--user-data-dir={PROFILE_PATH}')
+    driver = webdriver.Chrome(options=options)
+    driver.get('https://www.tiktok.com/foryou')
+    sleep(5)
+    pa.click(x=544, y=648)
+    user_list_unique = []
+    users_list_full = []
+    while True:
+        sleep(.5)
+        if keyboard.is_pressed('esc'):
+            break
+        sopa = BeautifulSoup(driver.page_source, 'html.parser')
+        pa.scroll(-700)
+        users = sopa.find_all('h3', attrs={'data-e2e':'video-author-uniqueid'})
+        users_list_full.extend(users)
+        for user in users_list_full:
+            if user not in user_list_unique:
+                user_list_unique.append(user)
+                print(f'@{user.text}')
+
+    print()
+    linha(20)
+    print(f'FORAM ENCONTRADOS: {len(user_list_unique)} USERS')
+    linha(20)
+    driver.quit()
 if __name__ == '__main__':
-    comentario_youtube('https://www.youtube.com/watch?v=AFffT1qmuGs&ab_channel=DevAprender%7CJhonatandeSouza')
+    get_user_tiktok()
 

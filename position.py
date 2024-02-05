@@ -3,8 +3,9 @@ from time import sleep
 import keyboard
 
 
-def scroll():
-    for _ in range(12):
+def scroll(loop=12, time=2.5):
+    for _ in range(loop):
         pa.scroll(-500)
-        sleep(2.5)
-# print(pa.position())-
+        sleep(time)
+# sleep(5)
+# print(pa.position())
