@@ -193,7 +193,6 @@ def comentario_youtube(url_video):
     nome_perfil = [nome.find_element(By.XPATH, './/yt-formatted-string[contains(@class," style-scope ytd-comment-renderer style-scope ytd-comment-renderer")]').text for nome in lista_comentarios if nome is not None]
     print(nome_perfil)
     print(len(nome_perfil))
-
 def get_user_tiktok():
     options.add_argument('--start-maximized')
     options.add_argument(f'--user-data-dir={PROFILE_PATH}')
@@ -221,6 +220,8 @@ def get_user_tiktok():
     print(f'FORAM ENCONTRADOS: {len(user_list_unique)} USERS')
     linha(20)
     driver.quit()
+
+
 if __name__ == '__main__':
     get_user_tiktok()
 
