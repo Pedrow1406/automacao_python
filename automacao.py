@@ -37,31 +37,48 @@ def instagram_acess(username,your_password, text) -> str:
     first_profile = '/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/div/div/div[2]/div/div/div[2]/div/div/div[2]/div/a[1]/div[1]/div/div/div[2]/div/div'
 
     follow = '/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/div[2]/section/main/div/header/section/div[1]/div[1]/div/div[1]/button/div/div'
+    my_profile = '//*[@id="mount_0_0_83"]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/div/div/div/div/div[2]/div[8]/div/span/div/a/div'
 
+    seguidores = '//*[@id="mount_0_0_83"]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/div[2]/section/main/div/header/section/ul/li[2]/a'
+
+    total_seguidores = '//*[@id="mount_0_0_83"]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/div[2]/section/main/div/header/section/ul/li[2]/a/span/span'
     options.add_argument(f'user-data-dir={PROFILE_PATH}')
     options.add_argument(f'--start-maximized')
     driver = webdriver.Chrome(service=service, options=options)
     driver.get('https://www.instagram.com/')
     sleep(5)
+    try:
+        user_login = driver.find_element(By.CSS_SELECTOR, user)
+        user_login.click()
+        sleep(1)
+        user_login.send_keys(username)
+        sleep(1)
+        password_login = driver.find_element(By.CSS_SELECTOR, password)
+        password_login.click()
+        sleep(.5)
+        password_login.send_keys(your_password)
+        sleep(1)
+        driver.find_element(By.CSS_SELECTOR, join).click()
+        sleep(10)
+        driver.find_element(By.CSS_SELECTOR, save_info_no).click()
+        sleep(3)
+        driver.find_element(By.CSS_SELECTOR, active_noti_no).click()
+        sleep(1)
+    except: ...
+    driver.find_element(By.XPATH, my_profile).click()
+    sleep(2)
+    driver.find_element(By.XPATH, total_seguidores).text
+    sleep(.5)
+    driver.find_element(By.XPATH, seguidores).click()
+    sleep(2)
+    pa.click(x=1253, y=461)
+    while True:
+        sleep(.7)
+        pa.scroll(-700)
+        if keyboard.is_pressed('esc'):
+            break
 
-    user_login = driver.find_element(By.CSS_SELECTOR, user)
-    user_login.click()
-    sleep(.5)
-    user_login.send_keys(username)
-    sleep(.5)
-    password_login = driver.find_element(By.CSS_SELECTOR, password)
-    password_login.click()
-    sleep(.5)
-    password_login.send_keys(your_password)
-    sleep(.5)
-    driver.find_element(By.CSS_SELECTOR, join).click()
-    sleep(10)
-    driver.find_element(By.CSS_SELECTOR, save_info_no).click()
-    sleep(3)
-    driver.find_element(By.CSS_SELECTOR, active_noti_no).click()
-    sleep(1)
-    driver.find_element(By.XPATH, lupa_search).click()
-    sleep(.5)  
+
     barra_pesquisa = driver.find_element(By.XPATH, barra_search)
     barra_pesquisa.click()
     sleep(.5)
@@ -70,6 +87,7 @@ def instagram_acess(username,your_password, text) -> str:
     driver.find_element(By.XPATH, first_profile).click()
     sleep(.5)
     driver.find_element(By.XPATH, follow).click()
+    driver.quit()
 def book_toscrap():
     options.add_argument(f'--user-data-dir={PROFILE_PATH}')
     driver = webdriver.Chrome(service=service, options=options)
@@ -220,8 +238,103 @@ def get_user_tiktok():
     print(f'FORAM ENCONTRADOS: {len(user_list_unique)} USERS')
     linha(20)
     driver.quit()
+def get_following_tiktok():
+    options.add_argument('--start-maximized')
+    options.add_argument(f'--user-data-dir={PROFILE_PATH}')
+    driver = webdriver.Chrome(options=options)
+    driver.get('https://www.tiktok.com/pt-BR')
+    sleep(5)
+    driver.find_element(By.XPATH, '//a[@data-e2e="nav-profile"]').click()
+    sleep(20)
+    driver.find_element(By.XPATH, '//span[@data-e2e="following"]').click()
+    sleep(2)
+    pa.click(x=855, y=257)
+    sleep(.5)
+    pa.moveTo(x=898, y=528)
+    following_list_unique = []
+    following_list_unique_now = []
+    following_list_full = []
+    break_outer = False
+    quantidade_seguidor = int(driver.find_element(By.XPATH, '//strong[@title="Seguindo"]').text)
+    while True:
+        if break_outer:
+            break
+        if keyboard.is_pressed('s'):
+            break_outer = True
+        seguidor_sumiu = []
+        sleep(.4)
+        if keyboard.is_pressed('p'): # Para parar de scrolar
+            while True:
+                if break_outer:
+                    break
+                if keyboard.is_pressed('esc'):
+                    break_outer = True
+                sleep(3)
+                if keyboard.is_pressed('r'):
+                    while True:
+                        if break_outer:
+                            break
+                        if keyboard.is_pressed('esc'):
+                                break_outer = True
+                        sleep(5)
+                        driver.refresh()
+                        quantidade_seguidor_atual = int(driver.find_element(By.XPATH, '//strong[@title="Seguindo"]').text)
+                        if quantidade_seguidor != quantidade_seguidor_atual:
+                            sleep(2)
+                            driver.find_element(By.XPATH, '//span[@data-e2e="following"]').click()
+                            sleep(2)
+                            pa.click(x=855, y=257)
+                            sleep(.5)
+                            pa.moveTo(x=898, y=528)
+                            while True:
+                                if break_outer:
+                                    break
+                                if keyboard.is_pressed('s'):
+                                    break_outer = True
+
+                                following_list = driver.find_elements(By.XPATH, '//p[contains(@class, "css-3gbgjv-PUniqueId es616eb8")]')
+                                following_list = [f.text for f in following_list]
+                                for follow in following_list:
+                                    if follow not in following_list_unique_now:
+                                        following_list_unique_now.append(follow)
+                                pa.scroll(-800)
+                                if keyboard.is_pressed('p'):
+                                        if len(following_list_unique) > len(following_list_unique_now):
+                                            maior_lista = following_list_unique
+                                            menor_lista = following_list_unique_now
+                                        else:
+                                            maior_lista = following_list_unique_now
+                                            menor_lista = following_list_unique
+
+                                        for follow in maior_lista:
+                                            if follow not in menor_lista:
+                                                seguidor_sumiu.append(follow)
+                                                print(f'Unfollow @{follow}')
+
+                                        following_list_unique = following_list_unique_now.copy()
+                                        following_list_unique_now = []
+                                        quantidade_seguidor = quantidade_seguidor_atual
+                                        break
 
 
+        following_list = driver.find_elements(By.XPATH, '//p[contains(@class, "css-3gbgjv-PUniqueId es616eb8")]')
+        following_list = [f.text for f in following_list]
+
+        for follow in following_list:
+            if follow not in following_list_unique:
+                following_list_unique.append(follow)
+        
+        pa.scroll(-800)
+    driver.quit()
+    if following_list_unique_now:
+        following_list_unique = following_list_unique_now
+        print(f'Voce esta seguindo {len(following_list_unique_now)} pessoas')
+    else:
+        print(f'Voce esta seguindo {len(following_list_unique)} pessoas')
+    driver.quit()
+    if seguidor_sumiu:
+        print('Você parou de seguir: ')
+        for sumido in seguidor_sumiu:
+            print(f' - @{sumido}')
 if __name__ == '__main__':
-    get_user_tiktok()
-
+   
