@@ -337,4 +337,4 @@ def get_following_tiktok():
         for sumido in seguidor_sumiu:
             print(f' - @{sumido}')
 if __name__ == '__main__':
-   
+    ...
