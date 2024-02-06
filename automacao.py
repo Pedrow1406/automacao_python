@@ -336,5 +336,7 @@ def get_following_tiktok():
         print('Você parou de seguir: ')
         for sumido in seguidor_sumiu:
             print(f' - @{sumido}')
+
+
 if __name__ == '__main__':
     ...
