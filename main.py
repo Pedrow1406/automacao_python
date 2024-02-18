@@ -1,5 +1,5 @@
 from automacao import acessar_youtube
-
+from datetime import datetime
 def triangle(quantidade):
     for column in range(1,quantidade+1):
         print('*' * column)
@@ -33,7 +33,16 @@ def busca_elemento_lista(elemento):
         if l == elemento:
             return i
         
-tree(10)
-print()
-print()
-tree_inversed(10)
+
+def days_remaining(day, month, year=datetime.now().year):
+    target_date = datetime(day=day, month=month, year=year)
+    current_date = datetime.now()
+    remaining = target_date - current_date
+    day_remaining = remaining.days
+    
+    day = str(day).zfill(2) # Adiciona zeros a esquerda para se adaptar a quantidade de algarismos passado como parâmetro. Ex: '13'.zfill(4) == '0013' 
+    month = str(month).zfill(2)
+    print(f'Restam {day_remaining} dias para {day}/{month}/{year}')
+
+
+days_remaining(18, 3)
